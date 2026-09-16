@@ -1,0 +1,35 @@
+:root {
+  --mica-bg: rgba(28, 27, 32, 0.72);
+  --mica-bg-strong: rgba(32, 31, 37, 0.88);
+  --mica-border: rgba(255, 255, 255, 0.12);
+  --mica-blur: 22px;
+}
+
+.mica-surface {
+  background: var(--mica-bg-strong);
+  border: 1px solid var(--mica-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+[data-mica="true"] .mica-surface {
+  background: var(--mica-bg);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  [data-mica="true"] .mica-surface {
+    -webkit-backdrop-filter: saturate(150%) blur(var(--mica-blur));
+    backdrop-filter: saturate(150%) blur(var(--mica-blur));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+[data-reduce-motion="true"] * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
