@@ -1,4 +1,4 @@
-# Master Implementation Prompt — Local Music Player
+# Master Implementation Prompt — MPWeb
 
 > Gunakan prompt ini pada AI coding agent setelah lima dokumen berikut berada di root repository:
 >
@@ -9,7 +9,7 @@
 > - `schema.md`
 
 ```text
-Kamu adalah Senior Frontend Engineer dan Software Architect. Buat aplikasi web local-first bernama "Local Music Player" sesuai dokumen proyek yang tersedia di root repository:
+Kamu adalah Senior Frontend Engineer dan Software Architect. Buat aplikasi web local-first bernama "MPWeb" sesuai dokumen proyek yang tersedia di root repository:
 
 - architecture.md
 - design.md
@@ -450,3 +450,4 @@ Lanjutkan hanya Tahap 4 — Playlist, favorite, history, dan settings dari maste
 ```text
 Lanjutkan hanya Tahap 5 — Quality pass dari master implementation prompt. Audit dependency rule, cleanup listener dan object URL, responsive layout, Material 3/mica fallback, accessibility, keyboard shortcut, error state, serta test coverage. Perbaiki masalah yang ditemukan dengan perubahan minimal. Jalankan lint, typecheck, test, dan production build; laporkan hasil sebenarnya.
 ```
+

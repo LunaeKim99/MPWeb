@@ -1,4 +1,4 @@
-# Design Specification — Local Music Player
+# Design Specification — MPWeb
 
 ## 1. Arah Desain
 
@@ -211,3 +211,4 @@ Mica primitive berada di `presentation/theme/mica.css`:
 - Playlist kosong: `Playlist ini masih kosong` — `Tambahkan lagu dari Library atau queue.`
 - Pencarian kosong: `Tidak ada lagu yang cocok` — `Coba kata kunci lain atau hapus filter.`
 - File error: `Lagu tidak dapat diputar` — `Format mungkin tidak didukung atau file tidak lagi tersedia.`
+

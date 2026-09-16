@@ -1,8 +1,8 @@
-# Development Rules — Local Music Player
+# Development Rules — MPWeb
 
 ## 1. Tujuan
 
-Dokumen ini menetapkan aturan implementasi Clean Architecture untuk proyek Local Music Player. Aturan berlaku untuk developer dan AI coding agent agar codebase tetap mudah diuji, tidak coupled dengan framework, dan siap berkembang.
+Dokumen ini menetapkan aturan implementasi Clean Architecture untuk proyek MPWeb. Aturan berlaku untuk developer dan AI coding agent agar codebase tetap mudah diuji, tidak coupled dengan framework, dan siap berkembang.
 
 ## 2. Golden Rules
 
@@ -114,3 +114,4 @@ Dokumen ini menetapkan aturan implementasi Clean Architecture untuk proyek Local
   - Aksesibilitas keyboard/focus dipertimbangkan.
   - UI tetap berfungsi saat mica dimatikan.
   - Dokumentasi architecture/schema diperbarui jika contract atau persistence berubah.
+

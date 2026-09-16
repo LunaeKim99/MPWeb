@@ -1,4 +1,4 @@
-# Data Schema — Local Music Player
+# Data Schema — MPWeb
 
 ## 1. Scope dan Ownership
 
@@ -384,3 +384,4 @@ this.version(2)
 ```
 
 Migration tidak boleh tersebar di use case atau presentation layer.
+

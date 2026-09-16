@@ -4,7 +4,7 @@
 
 | Item          | Detail                                                                   |
 | ------------- | ------------------------------------------------------------------------ |
-| Nama kerja    | Local Music Player                                                       |
+| Nama kerja    | MPWeb                                                       |
 | Platform      | Web application, localhost-first                                         |
 | Target awal   | Pengguna personal dengan koleksi audio lokal                             |
 | Bentuk produk | Single-page application (SPA)                                            |
@@ -183,3 +183,4 @@ MVP engineering selesai bila:
 | Izin file hilang setelah refresh | Track unavailable         | Simpan metadata; minta user memilih ulang file/folder jika diperlukan                         |
 | Blur mica membebani GPU          | Scrolling lambat          | Batasi pada panel besar dan sediakan fallback/toggle                                          |
 | Object URL bocor                 | Memori bertambah          | Kelola lifecycle URL melalui infrastructure adapter                                           |
+

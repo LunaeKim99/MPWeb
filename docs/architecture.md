@@ -1,4 +1,4 @@
-# Architecture — Local Music Player
+# Architecture — MPWeb
 
 ## 1. Ringkasan
 
@@ -294,3 +294,4 @@ Efek `backdrop-filter` harus punya fallback opaque dan hanya dipakai pada app sh
 ## 10. Evolusi Backend
 
 Jika kelak ditambah Laravel API, domain dan use case tidak berubah. Buat adapter baru, misalnya `LaravelTrackRepository`, yang tetap mengimplementasikan `TrackRepository`. Composition root memilih adapter local Dexie atau API berdasarkan mode aplikasi.
+

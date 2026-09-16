@@ -1,5 +1,5 @@
 {
-  "name": "local-music-player",
+  "name": "mpweb",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -41,3 +41,4 @@
     "vitest": "^5.0.0"
   }
 }
+
