@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Alert from "@mui/material/Alert";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { Playlist, PlaylistItem } from "@/domain/entities/Playlist.ts";
@@ -10,6 +14,8 @@ import type { Track } from "@/domain/entities/Track.ts";
 import { getContainer } from "@/di/container.ts";
 import TrackList from "@/presentation/components/library/TrackList.tsx";
 import { toTrackListItemViewModel } from "@/presentation/view-models/TrackListItemViewModel.ts";
+import PlaylistHero from "@/presentation/components/playlist/PlaylistHero.tsx";
+import { ConfirmDialog } from "@/presentation/components/common/ConfirmDialog.tsx";
 import { usePlayerStore } from "@/presentation/stores/playerStore.ts";
 
 export function PlaylistDetailPage() {
@@ -18,6 +24,8 @@ export function PlaylistDetailPage() {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const refresh = async (id: string) => {
     try {
@@ -52,25 +60,11 @@ export function PlaylistDetailPage() {
 
   const playTrack = usePlayerStore((s) => s.playTrack);
   const addToQueue = usePlayerStore((s) => s.addToQueue);
+  const activeTrackId = usePlayerStore((s) => s.currentTrackId);
+
   const toggleFavorite = async (trackId: string) => {
     await getContainer().facade.toggleFavorite(trackId);
     if (playlistId) await refresh(playlistId);
-  };
-
-  const move = async (index: number, delta: -1 | 1) => {
-    if (!playlistId) return;
-    const next = [...tracks];
-    const target = index + delta;
-    if (target < 0 || target >= next.length) return;
-    const a = next[index]!;
-    const b = next[target]!;
-    next[index] = b;
-    next[target] = a;
-    await getContainer().facade.reorderPlaylist(
-      playlistId,
-      next.map((t) => t.id),
-    );
-    await refresh(playlistId);
   };
 
   const remove = async (trackId: string) => {
@@ -93,89 +87,109 @@ export function PlaylistDetailPage() {
   if (!playlist) return <Typography>Loading…</Typography>;
 
   const ids = tracks.map((t) => t.id);
+  const hasTracks = tracks.length > 0;
 
   return (
-    <Stack spacing={2} sx={{ maxWidth: 960, mx: "auto", width: "100%" }}>
-      <Button
-        size="small"
-        sx={{ alignSelf: "flex-start" }}
-        onClick={() => void navigate("/playlists")}
+    <Stack spacing={3} sx={{ maxWidth: 1200, mx: "auto", width: "100%" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
-        ← Back
-      </Button>
-      <Typography variant="h5">{playlist.name}</Typography>
-      <Typography variant="body2" color="text.secondary">
-        {tracks.length} track{tracks.length === 1 ? "" : "s"}
-      </Typography>
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
         <Button
-          variant="contained"
-          disabled={tracks.length === 0}
-          onClick={() => void playTrack(ids[0]!, ids)}
+          size="small"
+          sx={{ alignSelf: "flex-start" }}
+          onClick={() => void navigate("/playlists")}
         >
-          Play all
+          ← Back
         </Button>
-        <Button
-          variant="outlined"
-          disabled={tracks.length === 0}
-          onClick={() => {
-            const shuffled = [...ids].sort(() => Math.random() - 0.5);
-            void playTrack(shuffled[0]!, shuffled);
-          }}
+        <IconButton
+          aria-label="Playlist options"
+          onClick={(e) => setMenuAnchor(e.currentTarget)}
         >
-          Shuffle
-        </Button>
+          ⋯
+        </IconButton>
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={() => setMenuAnchor(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              setMenuAnchor(null);
+            }}
+          >
+            Rename
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setMenuAnchor(null);
+              setConfirmDelete(true);
+            }}
+            sx={{ color: "error.main" }}
+          >
+            Delete
+          </MenuItem>
+        </Menu>
       </Box>
-      {tracks.length === 0 ? (
+
+      <PlaylistHero
+        cover={
+          <Avatar
+            variant="rounded"
+            sx={{
+              width: 160,
+              height: 160,
+              fontSize: 48,
+              borderRadius: 3,
+              bgcolor: "primaryContainer",
+            }}
+          >
+            ♫
+          </Avatar>
+        }
+        title={playlist.name}
+        description={playlist.description ?? "Your collection"}
+        meta={`${tracks.length} track${tracks.length === 1 ? "" : "s"} · created ${new Date(playlist.createdAt).toLocaleDateString()}`}
+        playDisabled={!hasTracks}
+        onPlay={() => void playTrack(ids[0]!, ids)}
+        onShuffle={() => {
+          const shuffled = [...ids].sort(() => Math.random() - 0.5);
+          void playTrack(shuffled[0]!, shuffled);
+        }}
+      />
+
+      {!hasTracks ? (
         <Typography variant="body2" color="text.secondary">
-          Playlist ini masih kosong — Tambahkan lagu dari Library atau queue.
+          This playlist is empty — add tracks from Library or queue.
         </Typography>
       ) : (
-        <Stack spacing={1}>
-          {tracks.map((track, index) => (
-            <Box
-              key={track.id}
-              sx={{
-                display: "flex",
-                gap: 1,
-                alignItems: "center",
-                border: 1,
-                borderColor: "divider",
-                borderRadius: 1,
-                p: 1,
-              }}
-            >
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <TrackList
-                  items={[toTrackListItemViewModel(track)]}
-                  onPlay={(id) => void playTrack(id, ids)}
-                  onAddToQueue={(id) => void addToQueue([id])}
-                  onToggleFavorite={(id) => void toggleFavorite(id)}
-                  onRemove={(id) => void remove(id)}
-                />
-              </Box>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                <Button
-                  size="small"
-                  aria-label={`Move ${track.title} up`}
-                  disabled={index === 0}
-                  onClick={() => void move(index, -1)}
-                >
-                  ↑
-                </Button>
-                <Button
-                  size="small"
-                  aria-label={`Move ${track.title} down`}
-                  disabled={index === tracks.length - 1}
-                  onClick={() => void move(index, 1)}
-                >
-                  ↓
-                </Button>
-              </Box>
-            </Box>
-          ))}
-        </Stack>
+        <TrackList
+          items={tracks.map((t) =>
+            toTrackListItemViewModel(t, activeTrackId ?? undefined),
+          )}
+          onPlay={(id) => void playTrack(id, ids)}
+          onAddToQueue={(id) => void addToQueue([id])}
+          onToggleFavorite={(id) => void toggleFavorite(id)}
+          onRemove={(id) => void remove(id)}
+        />
       )}
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete playlist"
+        description={`Delete "${playlist.name}"? Tracks stay in Library. This cannot be undone.`}
+        confirmLabel="Delete"
+        confirmColor="error"
+        onCancel={() => setConfirmDelete(false)}
+        onConfirm={async () => {
+          await getContainer().facade.deletePlaylist(playlist.id);
+          setConfirmDelete(false);
+          await navigate("/playlists");
+        }}
+      />
     </Stack>
   );
 }

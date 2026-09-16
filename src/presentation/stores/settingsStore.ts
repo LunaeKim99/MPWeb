@@ -37,7 +37,8 @@ export const useSettingsStore = create<SettingsState>()((set) => ({
     } catch (error) {
       set({
         status: "error",
-        errorMessage: error instanceof Error ? error.message : "Settings failed to load",
+        errorMessage:
+          error instanceof Error ? error.message : "Settings failed to load",
       });
     }
   },

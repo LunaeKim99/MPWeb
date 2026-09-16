@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import type { Track } from "@/domain/entities/Track.ts";
 import type { RepeatMode } from "@/domain/value-objects/ids.ts";
-import type { AudioPlaybackEvent, AudioPlaybackStatus } from "@/domain/ports/ports.ts";
+import type {
+  AudioPlaybackEvent,
+  AudioPlaybackStatus,
+} from "@/domain/ports/ports.ts";
 import type { AppFacade } from "@/application/factories/AppFacade.ts";
 import { getContainer } from "@/di/container.ts";
 
@@ -23,7 +26,10 @@ export interface PlayerState {
 
   init: () => Promise<void>;
   applyPlaybackEvent: (event: AudioPlaybackEvent) => void;
-  playTrack: (trackId: string, queueIds?: string[] | undefined) => Promise<void>;
+  playTrack: (
+    trackId: string,
+    queueIds?: string[] | undefined,
+  ) => Promise<void>;
   togglePlayPause: () => Promise<void>;
   pause: () => Promise<void>;
   next: () => Promise<void>;
@@ -93,7 +99,10 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
       status: event.status,
       positionSeconds: event.positionSeconds,
       durationSeconds: event.durationSeconds ?? state.durationSeconds,
-      errorMessage: event.status === "error" ? (event.errorMessage ?? "Playback error") : null,
+      errorMessage:
+        event.status === "error"
+          ? (event.errorMessage ?? "Playback error")
+          : null,
     }));
   },
 
@@ -111,7 +120,8 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
     } catch (error) {
       set({
         status: "error",
-        errorMessage: error instanceof Error ? error.message : "Failed to play track",
+        errorMessage:
+          error instanceof Error ? error.message : "Failed to play track",
       });
     }
   },
@@ -185,7 +195,8 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
 
   cycleRepeat: async () => {
     const current = get().repeatMode;
-    const nextMode: RepeatMode = current === "off" ? "all" : current === "all" ? "one" : "off";
+    const nextMode: RepeatMode =
+      current === "off" ? "all" : current === "all" ? "one" : "off";
     await facade().setRepeatMode(nextMode);
     set({ repeatMode: nextMode });
   },

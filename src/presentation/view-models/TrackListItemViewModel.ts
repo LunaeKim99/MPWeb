@@ -14,7 +14,8 @@ export interface TrackListItemViewModel {
 }
 
 export function formatDuration(durationSeconds: number | null): string {
-  if (durationSeconds === null || !Number.isFinite(durationSeconds)) return "--:--";
+  if (durationSeconds === null || !Number.isFinite(durationSeconds))
+    return "--:--";
   const total = Math.max(0, Math.floor(durationSeconds));
   const minutes = Math.floor(total / 60);
   const seconds = total % 60;

@@ -39,7 +39,10 @@ export function setLibraryFacade(next: AppFacade | null): void {
   facadeRef = next;
 }
 
-async function loadInto(set: (patch: Partial<LibraryState>) => void, get: () => LibraryState) {
+async function loadInto(
+  set: (patch: Partial<LibraryState>) => void,
+  get: () => LibraryState,
+) {
   set({ status: "loading", errorMessage: null });
   try {
     const params: LibraryQuery = {
@@ -52,7 +55,8 @@ async function loadInto(set: (patch: Partial<LibraryState>) => void, get: () => 
   } catch (error) {
     set({
       status: "error",
-      errorMessage: error instanceof Error ? error.message : "Library failed to load",
+      errorMessage:
+        error instanceof Error ? error.message : "Library failed to load",
     });
   }
 }
@@ -67,19 +71,31 @@ export const useLibraryStore = create<LibraryState>()((set, get) => ({
   lastImport: null,
   errorMessage: null,
   refresh: async () => {
-    await loadInto(set as (patch: Partial<LibraryState>) => void, get as () => LibraryState);
+    await loadInto(
+      set as (patch: Partial<LibraryState>) => void,
+      get as () => LibraryState,
+    );
   },
   setQuery: async (query) => {
     set({ query });
-    await loadInto(set as (patch: Partial<LibraryState>) => void, get as () => LibraryState);
+    await loadInto(
+      set as (patch: Partial<LibraryState>) => void,
+      get as () => LibraryState,
+    );
   },
   setSort: async (sort) => {
     set({ sort });
-    await loadInto(set as (patch: Partial<LibraryState>) => void, get as () => LibraryState);
+    await loadInto(
+      set as (patch: Partial<LibraryState>) => void,
+      get as () => LibraryState,
+    );
   },
   setFavoritesOnly: async (value) => {
     set({ favoritesOnly: value });
-    await loadInto(set as (patch: Partial<LibraryState>) => void, get as () => LibraryState);
+    await loadInto(
+      set as (patch: Partial<LibraryState>) => void,
+      get as () => LibraryState,
+    );
   },
   importFiles: async (files) => {
     set({ importStatus: "importing", lastImport: null, errorMessage: null });
@@ -93,7 +109,10 @@ export const useLibraryStore = create<LibraryState>()((set, get) => ({
       }));
       const outcome = await facade().importTracks(inputs);
       set({ importStatus: "done", lastImport: outcome });
-      await loadInto(set as (patch: Partial<LibraryState>) => void, get as () => LibraryState);
+      await loadInto(
+        set as (patch: Partial<LibraryState>) => void,
+        get as () => LibraryState,
+      );
       return outcome;
     } catch (error) {
       set({
@@ -105,10 +124,16 @@ export const useLibraryStore = create<LibraryState>()((set, get) => ({
   },
   toggleFavorite: async (trackId) => {
     await facade().toggleFavorite(trackId);
-    await loadInto(set as (patch: Partial<LibraryState>) => void, get as () => LibraryState);
+    await loadInto(
+      set as (patch: Partial<LibraryState>) => void,
+      get as () => LibraryState,
+    );
   },
   removeTrack: async (trackId) => {
     await facade().removeTrack(trackId);
-    await loadInto(set as (patch: Partial<LibraryState>) => void, get as () => LibraryState);
+    await loadInto(
+      set as (patch: Partial<LibraryState>) => void,
+      get as () => LibraryState,
+    );
   },
 }));

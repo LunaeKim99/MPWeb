@@ -4,7 +4,9 @@ import { getContainer } from "@/di/container.ts";
 
 export function usePlayerSync() {
   const init = usePlayerStore((state) => state.init);
-  const applyPlaybackEvent = usePlayerStore((state) => state.applyPlaybackEvent);
+  const applyPlaybackEvent = usePlayerStore(
+    (state) => state.applyPlaybackEvent,
+  );
 
   useEffect(() => {
     void init();

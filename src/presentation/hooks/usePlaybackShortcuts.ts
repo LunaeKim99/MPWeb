@@ -25,12 +25,7 @@ export function usePlaybackShortcuts(enabled = true): void {
         void togglePlayPause();
         return;
       }
-      if (
-        e.code === "ArrowLeft" &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey
-      ) {
+      if (e.code === "ArrowLeft" && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
         void seek(Math.max(0, positionSeconds - 5));
       } else if (

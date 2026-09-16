@@ -9,16 +9,23 @@ import type { Track } from "@/domain/entities/Track.ts";
 import type { Playlist } from "@/domain/entities/Playlist.ts";
 import { getContainer } from "@/di/container.ts";
 import TrackList from "@/presentation/components/library/TrackList.tsx";
+import PlaylistCard from "@/presentation/components/playlist/PlaylistCard.tsx";
+import CreatePlaylistCard from "@/presentation/components/playlist/CreatePlaylistCard.tsx";
+import SectionHeader from "@/presentation/components/common/SectionHeader.tsx";
+import EmptyCollectionCard from "@/presentation/components/common/EmptyCollectionCard.tsx";
 import { toTrackListItemViewModel } from "@/presentation/view-models/TrackListItemViewModel.ts";
 import { usePlayerStore } from "@/presentation/stores/playerStore.ts";
 
 export function HomePage() {
   const [recent, setRecent] = useState<Track[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const playTrack = usePlayerStore((s) => s.playTrack);
   const addToQueue = usePlayerStore((s) => s.addToQueue);
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -31,10 +38,10 @@ export function HomePage() {
         ]);
         const byId = new Map(library.map((t) => [t.id, t]));
         const recentTracks = history
-          .map((entry) => byId.get(entry.trackId))
+          .map((e) => byId.get(e.trackId))
           .filter((t): t is Track => Boolean(t));
         setRecent(recentTracks.length > 0 ? recentTracks : library.slice(0, 5));
-        setPlaylists(list.slice(-3).reverse());
+        setPlaylists(list.slice(-6).reverse());
         setStatus("ready");
       } catch (error) {
         setStatus("error");
@@ -47,78 +54,118 @@ export function HomePage() {
   }, []);
 
   return (
-    <Stack spacing={3} sx={{ maxWidth: 960, mx: "auto", width: "100%" }}>
+    <Stack spacing={4} sx={{ maxWidth: 1200, mx: "auto", width: "100%" }}>
       <Box
         sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: "background.paper",
-          border: "1px solid",
-          borderColor: "divider",
+          p: { xs: 3, md: 5 },
+          minHeight: { xs: 220, md: 300 },
+          borderRadius: 6,
+          background:
+            "linear-gradient(135deg,#1B4A35 0%,#191B1F 55%,#463D62 100%)",
+          color: "#E5E1E9",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: 1,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <Typography variant="h4" gutterBottom>
+        <Box
+          sx={{
+            position: "absolute",
+            top: -40,
+            right: -20,
+            fontSize: 180,
+            opacity: 0.08,
+          }}
+        >
+          ♫
+        </Box>
+        <Typography variant="overline" sx={{ letterSpacing: 2, opacity: 0.9 }}>
+          Good afternoon
+        </Typography>
+        <Typography variant="h4" sx={{ fontWeight: 700, maxWidth: 520 }}>
           Your local music, private by default
         </Typography>
-        <Typography color="text.secondary" gutterBottom>
-          Import audio from your device. Music is processed locally and never uploaded.
+        <Typography sx={{ opacity: 0.9, maxWidth: 480 }}>
+          Build your personal listening space. Files stay on device.
         </Typography>
-        <Stack direction="row" spacing={2}>
-          <Button component={Link} to="/library" variant="contained">
-            Open Library
+        <Stack direction="row" spacing={1.5} sx={{ mt: 1.5, flexWrap: "wrap" }}>
+          <Button
+            component={Link}
+            to="/library"
+            variant="contained"
+            sx={{ borderRadius: 20, px: 3 }}
+          >
+            Add music
           </Button>
-          <Button component={Link} to="/playlists" variant="outlined">
-            View Playlists
+          <Button
+            component={Link}
+            to="/library"
+            variant="outlined"
+            sx={{
+              borderRadius: 20,
+              px: 3,
+              borderColor: "rgba(255,255,255,0.4)",
+              color: "#E5E1E9",
+            }}
+          >
+            Open library
           </Button>
         </Stack>
       </Box>
-      {status === "loading" && <Typography>Loading…</Typography>}
+
+      {status === "loading" && (
+        <Typography color="text.secondary">Loading…</Typography>
+      )}
       {status === "error" && errorMessage && (
         <Alert severity="error">{errorMessage}</Alert>
       )}
+
       {status === "ready" && (
         <Box>
-          <Typography variant="h6" gutterBottom>
-            Recently played
-          </Typography>
-          <TrackList
-            items={recent.map((track) => toTrackListItemViewModel(track))}
-            onPlay={(id) => void playTrack(id, recent.map((t) => t.id))}
-            onAddToQueue={(id) => void addToQueue([id])}
-            emptyMessage="Nothing played yet — Import music and start listening."
-          />
+          <SectionHeader title="Recently played" seeAllTo="/library" />
+          {recent.length === 0 ? (
+            <EmptyCollectionCard
+              icon="♪"
+              title="Nothing played yet"
+              description="Import music and start listening."
+            />
+          ) : (
+            <TrackList
+              items={recent.map((t) => toTrackListItemViewModel(t))}
+              onPlay={(id) =>
+                void playTrack(
+                  id,
+                  recent.map((t) => t.id),
+                )
+              }
+              onAddToQueue={(id) => void addToQueue([id])}
+            />
+          )}
         </Box>
       )}
+
       {status === "ready" && (
         <Box>
-          <Typography variant="h6" gutterBottom>
-            Latest playlists
-          </Typography>
-          {playlists.length === 0 ? (
-            <Typography color="text.secondary">
-              No playlists yet. Create one from the Playlists page.
-            </Typography>
-          ) : (
-            <Stack spacing={1}>
-              {playlists.map((playlist) => (
-                <Box
-                  key={playlist.id}
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    border: "1px solid",
-                    borderColor: "divider",
-                    bgcolor: "background.paper",
-                  }}
-                >
-                    <Typography sx={{ fontWeight: 600 }}>{playlist.name}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {playlist.description ?? "No description"}
-                    </Typography>
-                </Box>
-              ))}
-            </Stack>
-          )}
+          <SectionHeader title="Your playlists" seeAllTo="/playlists" />
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(3,1fr)" },
+              gap: 2,
+            }}
+          >
+            <CreatePlaylistCard
+              onClick={() => {
+                window.location.hash = "/playlists";
+              }}
+            />
+            {playlists.map((p) => (
+              <PlaylistCard key={p.id} playlist={p} />
+            ))}
+          </Box>
         </Box>
       )}
     </Stack>
