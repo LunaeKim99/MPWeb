@@ -34,7 +34,12 @@ export function ConfirmDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel}>{cancelLabel}</Button>
-        <Button variant="contained" color={confirmColor} onClick={onConfirm} autoFocus>
+        <Button
+          variant="contained"
+          color={confirmColor}
+          onClick={onConfirm}
+          autoFocus
+        >
           {confirmLabel}
         </Button>
       </DialogActions>
