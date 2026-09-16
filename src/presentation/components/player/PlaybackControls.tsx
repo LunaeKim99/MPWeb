@@ -30,7 +30,11 @@ export function PlaybackControls({
   const isLoading = status === "loading";
 
   const repeatLabel =
-    repeatMode === "one" ? "Ulangi 1" : repeatMode === "all" ? "Ulangi Semua" : "Ulangi";
+    repeatMode === "one"
+      ? "Ulangi 1"
+      : repeatMode === "all"
+        ? "Ulangi Semua"
+        : "Ulangi";
 
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -89,7 +93,12 @@ export function PlaybackControls({
         disabled={disabled}
         color={repeatMode !== "off" ? "primary" : "default"}
       >
-        <span style={{ fontSize: "1.1rem", fontWeight: repeatMode === "one" ? "bold" : "normal" }}>
+        <span
+          style={{
+            fontSize: "1.1rem",
+            fontWeight: repeatMode === "one" ? "bold" : "normal",
+          }}
+        >
           {repeatMode === "one" ? "\uD83D\uDD02" : "\uD83D\uDD01"}
         </span>
       </IconButton>

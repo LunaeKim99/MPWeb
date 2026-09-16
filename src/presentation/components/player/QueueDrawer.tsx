@@ -1,3 +1,4 @@
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
@@ -35,16 +36,36 @@ export function QueueDrawer({
       onClose={onClose}
       slotProps={{ backdrop: { onClick: onClose } }}
     >
-      <Box sx={{ width: 340, p: 2, display: "flex", flexDirection: "column", gap: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Typography variant="h6">Antrean</Typography>
-          <IconButton aria-label="Tutup antrean" onClick={onClose}>
+      <Box
+        className="mica-surface"
+        sx={{
+          width: { xs: "100vw", sm: 360 },
+          p: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+          minHeight: "100%",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="h6">Queue</Typography>
+          <IconButton aria-label="Close queue" onClick={onClose}>
             {"\u00D7"}
           </IconButton>
         </Box>
         {items.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ py: 4, textAlign: "center" }}>
-            Antrean masih kosong — Putar lagu atau tambahkan ke antrean.
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ py: 6, textAlign: "center" }}
+          >
+            Queue is empty — play a track or add one.
           </Typography>
         ) : (
           <List>
@@ -54,19 +75,30 @@ export function QueueDrawer({
                 secondaryAction={
                   <IconButton
                     size="small"
-                    aria-label={`Hapus ${entry.title} dari antrean`}
-                    title="Hapus dari antrean"
+                    aria-label={`Remove ${entry.title} from queue`}
+                    title="Remove from queue"
                     onClick={() => onRemove(entry.trackId)}
                   >
                     {"\u00D7"}
                   </IconButton>
                 }
               >
+                <Avatar
+                  variant="rounded"
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    mr: 1.5,
+                    bgcolor: "primaryContainer",
+                  }}
+                >
+                  ♫
+                </Avatar>
                 <Box
                   component="button"
-                  onClick={() => onPlay(entry.trackId)}
                   type="button"
-                  aria-label={`Putar ${entry.title}`}
+                  onClick={() => onPlay(entry.trackId)}
+                  aria-label={`Play ${entry.title}`}
                   style={{
                     display: "flex",
                     flexDirection: "column",
@@ -81,7 +113,9 @@ export function QueueDrawer({
                 >
                   <Typography
                     variant="body2"
-                    sx={{ fontWeight: entry.trackId === currentTrackId ? 700 : 400 }}
+                    sx={{
+                      fontWeight: entry.trackId === currentTrackId ? 700 : 400,
+                    }}
                   >
                     {entry.title}
                   </Typography>

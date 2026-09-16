@@ -6,9 +6,13 @@ import IconButton from "@mui/material/IconButton";
 import Slider from "@mui/material/Slider";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
+import MicaSurface from "@/presentation/components/common/MicaSurface.tsx";
+import MiniPlayer from "@/presentation/components/player/MiniPlayer.tsx";
 import PlaybackControls from "@/presentation/components/player/PlaybackControls.tsx";
 import ProgressControl from "@/presentation/components/player/ProgressControl.tsx";
-import QueueDrawer, { type QueueEntry } from "@/presentation/components/player/QueueDrawer.tsx";
+import QueueDrawer, {
+  type QueueEntry,
+} from "@/presentation/components/player/QueueDrawer.tsx";
 import NowPlayingDialog from "@/presentation/components/player/NowPlayingDialog.tsx";
 import { usePlayerStore } from "@/presentation/stores/playerStore.ts";
 import { useLibraryStore } from "@/presentation/stores/libraryStore.ts";
@@ -46,10 +50,8 @@ export function PlayerBar() {
 
   const toggleFavorite = useLibraryStore((s) => s.toggleFavorite);
   const libraryTracks = useLibraryStore((s) => s.tracks);
-
   const [queueItems, setQueueItems] = useState<QueueEntry[]>([]);
   const [showError, setShowError] = useState(false);
-
   const hasTrack = currentTrack !== null;
   const isMutedVisual = muted || volume === 0;
 
@@ -58,7 +60,6 @@ export function PlayerBar() {
     [libraryTracks],
   );
 
-  // Resolve queue titles: in-memory library map, Dexie fallback for misses
   useEffect(() => {
     let cancelled = false;
     const resolve = async () => {
@@ -70,21 +71,28 @@ export function PlayerBar() {
       const missing: string[] = [];
       for (const id of queueTrackIds) {
         const cached = libraryMap.get(id);
-        if (cached) entries.push({ trackId: id, title: cached.title, artistLabel: cached.artist });
+        if (cached)
+          entries.push({
+            trackId: id,
+            title: cached.title,
+            artistLabel: cached.artist,
+          });
         else missing.push(id);
       }
       if (missing.length > 0) {
         try {
-          const facade = getContainer().facade;
-          const lib = await facade.getLibrary();
+          const lib = await getContainer().facade.getLibrary();
           const byId = new Map(lib.map((t) => [t.id, t]));
           for (const id of missing) {
             const t = byId.get(id);
-            if (t) entries.push({ trackId: id, title: t.title, artistLabel: t.artist });
+            if (t)
+              entries.push({
+                trackId: id,
+                title: t.title,
+                artistLabel: t.artist,
+              });
           }
-        } catch {
-          // Ignore resolution failures
-        }
+        } catch {}
       }
       if (!cancelled) setQueueItems(entries);
     };
@@ -99,12 +107,9 @@ export function PlayerBar() {
   }, [status, errorMessage]);
 
   if (!hasTrack || !currentTrack) return null;
-
-  const favorite = libraryMap.get(currentTrack.id)?.isFavorite ?? currentTrack.isFavorite;
-  const subtitle = `${currentTrack.artist} — ${currentTrack.album}`;
-
+  const favorite =
+    libraryMap.get(currentTrack.id)?.isFavorite ?? currentTrack.isFavorite;
   const openNowPlaying = () => setNowPlayingOpen(true);
-
   const handleNext = () => {
     void (async () => {
       await next();
@@ -114,70 +119,65 @@ export function PlayerBar() {
   };
 
   return (
-    <Box
-      className="mica-surface"
-      component="footer"
-      role="region"
-      aria-label="Player bar"
-      sx={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1200,
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        px: 1.5,
-        py: 1,
-      }}
-    >
-      <Avatar
-        variant="rounded"
-        src={currentTrack.artwork?.dataUrl}
-        alt={currentTrack.title}
-        sx={{ width: 44, height: 44, cursor: "pointer" }}
-        onClick={openNowPlaying}
-      >
-        {currentTrack.title.charAt(0).toUpperCase()}
-      </Avatar>
-
-      <Box
-        component="button"
-        type="button"
-        onClick={openNowPlaying}
-        aria-label="Buka Now Playing"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          border: "none",
-          background: "none",
-          cursor: "pointer",
-          padding: 0,
-          minWidth: 0,
-          maxWidth: 220,
-          color: "inherit",
+    <>
+      <MicaSurface
+        component="footer"
+        sx={{
+          display: { xs: "none", sm: "flex" },
+          alignItems: "center",
+          gap: 2,
+          px: 2,
+          py: 1.5,
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1200,
+          borderRadius: 0,
+          borderLeft: 0,
+          borderRight: 0,
+          borderBottom: 0,
         }}
       >
-        <Typography variant="subtitle2" noWrap sx={{ maxWidth: "100%" }}>
-          {currentTrack.title}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: "100%" }}>
-          {subtitle}
-        </Typography>
-      </Box>
-
-      <IconButton
-        size="small"
-        aria-label={favorite ? "Hapus favorit" : "Tambah favorit"}
-        title={favorite ? "Hapus favorit" : "Tambah favorit"}
-        onClick={() => void toggleFavorite(currentTrack.id)}
-      >
-        {favorite ? "\u2605" : "\u2606"}
-      </IconButton>
-
-      <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+        <Avatar
+          variant="rounded"
+          src={currentTrack.artwork?.dataUrl}
+          alt={currentTrack.title}
+          sx={{ width: 52, height: 52, cursor: "pointer" }}
+          onClick={openNowPlaying}
+        >
+          {currentTrack.title[0]?.toUpperCase()}
+        </Avatar>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0,
+            maxWidth: 200,
+          }}
+        >
+          <Typography variant="subtitle2" noWrap>
+            {currentTrack.title}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" noWrap>
+            {currentTrack.artist} — {currentTrack.album}
+          </Typography>
+        </Box>
+        <IconButton
+          size="small"
+          aria-label={favorite ? "Remove favorite" : "Add favorite"}
+          onClick={() => void toggleFavorite(currentTrack.id)}
+        >
+          {favorite ? "★" : "☆"}
+        </IconButton>
+        <Box sx={{ flex: 1, maxWidth: 560, mx: 1 }}>
+          <ProgressControl
+            positionSeconds={positionSeconds}
+            durationSeconds={durationSeconds}
+            onSeek={(pos) => void seek(pos)}
+            disabled={status === "loading"}
+          />
+        </Box>
         <PlaybackControls
           status={status}
           repeatMode={repeatMode}
@@ -188,67 +188,45 @@ export function PlayerBar() {
           onRepeatCycle={() => void cycleRepeat()}
           onToggleShuffle={() => void toggleShuffle()}
         />
-      </Box>
-      <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center" }}>
-        <IconButton
-          aria-label="Sebelumnya"
-          title="Sebelumnya"
-          onClick={() => void previous()}
-          size="small"
+        <Box
+          sx={{
+            display: { xs: "none", lg: "flex" },
+            alignItems: "center",
+            gap: 1,
+          }}
         >
-          {"\u23EE"}
-        </IconButton>
+          <IconButton
+            size="small"
+            aria-label={isMutedVisual ? "Unmute" : "Mute"}
+            onClick={() => void toggleMute()}
+          >
+            {isMutedVisual ? "🔇" : "🔊"}
+          </IconButton>
+          <Slider
+            size="small"
+            aria-label="Volume"
+            min={0}
+            max={1}
+            step={0.05}
+            value={muted ? 0 : volume}
+            onChange={(_, v) => void setVolume(v as number)}
+            sx={{ width: 90 }}
+          />
+        </Box>
         <IconButton
-          aria-label={status === "playing" ? "Jeda" : "Putar"}
-          title={status === "playing" ? "Jeda" : "Putar"}
-          onClick={() => void togglePlayPause()}
-          disabled={status === "loading"}
+          aria-label="Queue"
+          title="Queue"
+          onClick={() => setQueueOpen(true)}
         >
-          {status === "loading" ? "\u23F3" : status === "playing" ? "\u23F8" : "\u25B6"}
+          ☰
         </IconButton>
-        <IconButton aria-label="Berikutnya" title="Berikutnya" onClick={handleNext} size="small">
-          {"\u23ED"}
-        </IconButton>
-      </Box>
-
-      <Box sx={{ flex: 1, display: { xs: "none", sm: "flex" } }}>
-        <ProgressControl
-          positionSeconds={positionSeconds}
-          durationSeconds={durationSeconds}
-          onSeek={(pos) => void seek(pos)}
-          disabled={status === "loading"}
-        />
-      </Box>
-
-      <Box sx={{ display: { xs: "none", lg: "flex" }, alignItems: "center", gap: 1, minWidth: 150 }}>
-        <IconButton
-          size="small"
-          aria-label={isMutedVisual ? "Aktifkan suara" : "Bisukan"}
-          title={isMutedVisual ? "Aktifkan suara" : "Bisukan"}
-          onClick={() => void toggleMute()}
-        >
-          {isMutedVisual ? "\uD83D\uDD07" : "\uD83D\uDD0A"}
-        </IconButton>
-        <Slider
-          size="small"
-          aria-label="Volume"
-          min={0}
-          max={1}
-          step={0.05}
-          value={muted ? 0 : volume}
-          onChange={(_e, val) => void setVolume(val as number)}
-          sx={{ width: 90 }}
-        />
-      </Box>
-
-      <IconButton
-        aria-label="Antrean"
-        title="Buka antrean"
-        onClick={() => setQueueOpen(true)}
-      >
-        {"\u2630"}
-      </IconButton>
-
+      </MicaSurface>
+      <MiniPlayer
+        track={currentTrack}
+        status={status}
+        onTogglePlayPause={() => void togglePlayPause()}
+        onOpen={openNowPlaying}
+      />
       <QueueDrawer
         open={isQueueOpen}
         onClose={() => setQueueOpen(false)}
@@ -257,7 +235,6 @@ export function PlayerBar() {
         onPlay={(id) => void playTrack(id, queueTrackIds)}
         onRemove={(id) => void removeFromQueue(id)}
       />
-
       <NowPlayingDialog
         open={isNowPlayingOpen}
         onClose={() => setNowPlayingOpen(false)}
@@ -274,7 +251,6 @@ export function PlayerBar() {
         onToggleShuffle={() => void toggleShuffle()}
         onSeek={(pos) => void seek(pos)}
       />
-
       <Snackbar
         open={showError}
         autoHideDuration={6000}
@@ -285,7 +261,7 @@ export function PlayerBar() {
           {errorMessage ?? "Playback error"}
         </Alert>
       </Snackbar>
-    </Box>
+    </>
   );
 }
 

@@ -44,29 +44,74 @@ export function NowPlayingDialog({
   onSeek,
 }: NowPlayingDialogProps) {
   if (!track) return null;
-
   const hasDuration = durationSeconds !== null && durationSeconds > 0;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-label="Now playing">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      aria-label="Now playing"
+      fullScreen={typeof window !== "undefined" && window.innerWidth < 600}
+      slotProps={{
+        paper: {
+          sx: {
+            background: "linear-gradient(160deg, #1E5135 0%, #191B1F 60%)",
+            color: "onSurface",
+          },
+        },
+      }}
+    >
       <Box sx={{ display: "flex", justifyContent: "flex-end", px: 1, pt: 1 }}>
-        <IconButton aria-label="Tutup" title="Tutup" onClick={onClose}>
+        <IconButton
+          aria-label="Close"
+          title="Close"
+          onClick={onClose}
+          sx={{ color: "inherit" }}
+        >
           {"\u00D7"}
         </IconButton>
       </Box>
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 3, alignItems: "center" }}>
+      <DialogContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+          alignItems: "center",
+          pb: 4,
+        }}
+      >
         <Avatar
           variant="rounded"
           src={track.artwork?.dataUrl}
           alt={track.title}
-          sx={{ width: 180, height: 180, fontSize: 48 }}
+          sx={{
+            width: { xs: 220, sm: 280 },
+            height: { xs: 220, sm: 280 },
+            fontSize: 56,
+            borderRadius: 4,
+          }}
         >
-          {track.title.charAt(0).toUpperCase()}
+          {track.title[0]?.toUpperCase()}
         </Avatar>
         <Box sx={{ textAlign: "center", width: "100%" }}>
-          <Typography variant="h6" noWrap>{track.title}</Typography>
-          <Typography variant="body2" color="text.secondary">{track.artist} — {track.album}</Typography>
+          <Typography variant="h5" noWrap>
+            {track.title}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "onSurfaceVariant", mt: 0.5 }}
+          >
+            {track.artist} — {track.album}
+          </Typography>
         </Box>
+        <ProgressControl
+          positionSeconds={positionSeconds}
+          durationSeconds={durationSeconds}
+          onSeek={onSeek}
+          disabled={!hasDuration}
+        />
         <PlaybackControls
           status={status}
           repeatMode={repeatMode}
@@ -76,12 +121,6 @@ export function NowPlayingDialog({
           onNext={onNext}
           onRepeatCycle={onRepeatCycle}
           onToggleShuffle={onToggleShuffle}
-        />
-        <ProgressControl
-          positionSeconds={positionSeconds}
-          durationSeconds={durationSeconds}
-          onSeek={onSeek}
-          disabled={!hasDuration}
         />
       </DialogContent>
     </Dialog>

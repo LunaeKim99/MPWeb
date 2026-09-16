@@ -30,8 +30,13 @@ export function ProgressControl({
   const current = isSeeking ? seekValue : positionSeconds;
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, width: "100%" }}>
-      <Typography variant="caption" sx={{ minWidth: 40, textAlign: "right", color: "text.secondary" }}>
+    <Box
+      sx={{ display: "flex", alignItems: "center", gap: 1.5, width: "100%" }}
+    >
+      <Typography
+        variant="caption"
+        sx={{ minWidth: 40, textAlign: "right", color: "text.secondary" }}
+      >
         {formatDuration(current)}
       </Typography>
       <Slider
@@ -52,7 +57,10 @@ export function ProgressControl({
         }}
         sx={{ flex: 1 }}
       />
-      <Typography variant="caption" sx={{ minWidth: 40, color: "text.secondary" }}>
+      <Typography
+        variant="caption"
+        sx={{ minWidth: 40, color: "text.secondary" }}
+      >
         {formatDuration(durationSeconds)}
       </Typography>
     </Box>

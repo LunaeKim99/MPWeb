@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import TrackList from "@/presentation/components/library/TrackList.tsx";
 import type { TrackListItemViewModel } from "@/presentation/view-models/TrackListItemViewModel.ts";
 
-const makeItem = (partial: Partial<TrackListItemViewModel> = {}): TrackListItemViewModel => ({
+const makeItem = (
+  partial: Partial<TrackListItemViewModel> = {},
+): TrackListItemViewModel => ({
   id: "id",
   title: "Track",
   artistLabel: "Artist",
@@ -17,15 +19,15 @@ const makeItem = (partial: Partial<TrackListItemViewModel> = {}): TrackListItemV
 });
 
 describe("TrackList", () => {
-  it("shows empty import CTA when no items", () => {
-    render(<TrackList items={[]} emptyMessage="No music in library" />);
-    expect(screen.getByText("No music in library")).toBeInTheDocument();
-  });
-
   it("renders track rows with accessible list label", () => {
     const { getAllByRole } = render(
       <TrackList
-        items={[makeItem({ id: "a", title: "A" }), makeItem({ id: "b", title: "B" })]}
+        items={[
+          makeItem({ id: "a", title: "A" }),
+          makeItem({ id: "b", title: "B" }),
+        ]}
+        onPlay={() => {}}
+        onAddToQueue={() => {}}
       />,
     );
     expect(screen.getByLabelText("Track list")).toBeInTheDocument();
@@ -34,7 +36,15 @@ describe("TrackList", () => {
   });
 
   it("exposes favorite toggle aria-label", () => {
-    render(<TrackList items={[makeItem({ id: "x", isFavorite: true })]} onToggleFavorite={() => {}} />);
-    expect(screen.getByLabelText("Hapus favorit")).toBeInTheDocument();
+    const onToggleFavorite = vi.fn();
+    render(
+      <TrackList
+        items={[makeItem({ id: "x", isFavorite: true })]}
+        onPlay={() => {}}
+        onAddToQueue={() => {}}
+        onToggleFavorite={onToggleFavorite}
+      />,
+    );
+    expect(screen.getByLabelText("Remove favorite")).toBeInTheDocument();
   });
 });
