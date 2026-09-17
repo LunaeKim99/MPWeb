@@ -40,6 +40,12 @@ export function resolveResolvedTheme(theme: ThemePreference): "light" | "dark" {
   return prefersDark ? "dark" : "light";
 }
 
+/**
+ * Design tokens as CSS custom properties, emitted on [data-mica] root via
+ * MuiCssBaseline styleOverrides. Values adapt to the resolved theme mode so
+ * tokens never hard-force light/dark.
+ */
+
 export function createAppTheme(
   themePreference: ThemePreference,
   reduceVisualEffects: boolean,
@@ -81,6 +87,45 @@ export function createAppTheme(
             "--on-surface": tokens.onSurface,
             "--on-surface-variant": tokens.onSurfaceVariant,
             "--outline": tokens.outline,
+            // Token overrides follow the resolved theme (dark/light) so the
+            // existing theme toggle keeps working. Base values live in mica.css.
+            "--color-bg":
+              mode === "dark" ? "#0b0d12" : tokens.backgroundDefault,
+            "--color-bg-elevated":
+              mode === "dark" ? "#10131b" : tokens.surfaceContainer,
+            "--color-surface":
+              mode === "dark"
+                ? "rgba(21, 24, 34, 0.72)"
+                : "rgba(255, 251, 254, 0.72)",
+            "--color-surface-hover":
+              mode === "dark"
+                ? "rgba(33, 38, 52, 0.82)"
+                : "rgba(236, 230, 240, 0.82)",
+            "--color-border":
+              mode === "dark"
+                ? "rgba(255, 255, 255, 0.08)"
+                : "rgba(29, 27, 32, 0.08)",
+            "--color-border-strong":
+              mode === "dark"
+                ? "rgba(255, 255, 255, 0.14)"
+                : "rgba(29, 27, 32, 0.14)",
+            "--color-text-primary":
+              mode === "dark" ? "#f5f7fb" : tokens.onSurface,
+            "--color-text-secondary":
+              mode === "dark" ? "#9ca3b3" : tokens.onSurfaceVariant,
+            "--color-text-muted":
+              mode === "dark" ? "#6d7484" : tokens.outline,
+            "--color-accent": mode === "dark" ? "#a78bfa" : "#6750a4",
+            "--color-accent-strong":
+              mode === "dark" ? "#c4b5fd" : "#4f378b",
+            "--color-accent-contrast":
+              mode === "dark" ? "#17131f" : "#ffffff",
+            "--color-accent-glow":
+              mode === "dark"
+                ? "rgba(167, 139, 250, 0.38)"
+                : "rgba(103, 80, 164, 0.24)",
+            "--color-success":
+              mode === "dark" ? "#4fd1c5" : "#0f766e",
           },
           body: {
             background: tokens.backgroundDefault,

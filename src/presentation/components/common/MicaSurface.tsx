@@ -6,6 +6,8 @@ interface MicaSurfaceProps {
   className?: string;
   sx?: object;
   component?: React.ElementType;
+  id?: string;
+  "aria-label"?: string;
 }
 
 export function MicaSurface({
@@ -13,10 +15,18 @@ export function MicaSurface({
   className,
   sx,
   component = "div",
+  id,
+  "aria-label": ariaLabel,
 }: MicaSurfaceProps) {
   const classes = className ? `mica-surface ${className}` : "mica-surface";
   return (
-    <Box component={component} className={classes} sx={sx}>
+    <Box
+      component={component}
+      className={classes}
+      sx={sx}
+      id={id}
+      aria-label={ariaLabel}
+    >
       {children}
     </Box>
   );

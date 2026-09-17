@@ -25,6 +25,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div
+        className="app-shell"
         data-mica={settings.micaEnabled ? "true" : "false"}
         data-reduce-motion={settings.reduceVisualEffects ? "true" : "false"}
         style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}

@@ -1,3 +1,64 @@
+/* Design tokens — dark personal music space direction.
+   Colors are overridden per resolved theme via createAppTheme MuiCssBaseline
+   so light/dark toggle stays intact. Radii/shadows/motion/sidebar/z remain
+   static here to avoid duplicate token systems. */
+:root {
+  --color-bg: #0b0d12;
+  --color-bg-elevated: #10131b;
+  --color-surface: rgba(21, 24, 34, 0.72);
+  --color-surface-hover: rgba(33, 38, 52, 0.82);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
+
+  --color-text-primary: #f5f7fb;
+  --color-text-secondary: #9ca3b3;
+  --color-text-muted: #6d7484;
+
+  --color-accent: #a78bfa;
+  --color-accent-strong: #c4b5fd;
+  --color-accent-contrast: #17131f;
+  --color-accent-glow: rgba(167, 139, 250, 0.38);
+  --color-success: #4fd1c5;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 14px 28px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 22px 46px rgba(0, 0, 0, 0.36);
+
+  --sidebar-expanded-width: 260px;
+  --sidebar-collapsed-width: 76px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 160ms;
+  --transition-base: 220ms;
+  --transition-sidebar: 300ms;
+
+  --z-sidebar: 30;
+  /* Reveal sits above sticky TopAppBar (z 1000) and below PlayerBar (1200). */
+  --z-sidebar-reveal: 1100;
+  /* Mobile drawer: backdrop above content and bottom nav (1100) but below
+     PlayerBar (1200); drawer panel sits just above its own backdrop. */
+  --z-sidebar-backdrop: 1140;
+  --z-sidebar-drawer: 1150;
+  --z-tooltip: 50;
+}
+
+/* App-shell ambient background — applied to shell wrapper only, not per-card.
+   Keeps text readable by layering subtle glows over --color-bg. */
+.app-shell {
+  min-height: 100vh;
+  color: var(--color-text-primary);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(167, 139, 250, 0.15), transparent 32%),
+    radial-gradient(circle at 88% 82%, rgba(79, 209, 197, 0.1), transparent 30%),
+    var(--color-bg);
+}
+
 .mica-surface {
   background: rgb(28 29 34 / 88%);
   border: 1px solid rgb(255 255 255 / 10%);
@@ -17,6 +78,577 @@
   }
 }
 
+/* === Sidebar system (Step 4) === */
+.app-sidebar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sidebar);
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-expanded-width);
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+  border-right: 1px solid var(--color-border);
+  background: rgba(14, 16, 24, 0.82);
+  backdrop-filter: blur(20px);
+  flex-shrink: 0;
+  transition:
+    width var(--transition-sidebar) var(--ease-out-expo),
+    transform var(--transition-sidebar) var(--ease-out-expo),
+    opacity var(--transition-base) ease,
+    border-color var(--transition-base) ease,
+    visibility var(--transition-sidebar) ease;
+}
+
+.app-sidebar--collapsed {
+  width: var(--sidebar-collapsed-width);
+  overflow: visible;
+}
+
+/* Hover/focus-expand: collapsed rail widens to full so labels are readable
+   without pinning. Active while hovering sidebar or when a nav item holds
+   keyboard focus. Tooltip lane suppressed so it never overlaps the pop-out. */
+@media (hover: hover) {
+  .app-sidebar--collapsed:hover {
+    width: var(--sidebar-expanded-width);
+  }
+}
+
+.app-sidebar--collapsed:focus-within {
+  width: var(--sidebar-expanded-width);
+}
+
+.app-sidebar--collapsed:hover .brand-copy,
+.app-sidebar--collapsed:hover .sidebar-label,
+.app-sidebar--collapsed:hover .sidebar-hide,
+.app-sidebar--collapsed:hover .sidebar-footer,
+.app-sidebar--collapsed:focus-within .brand-copy,
+.app-sidebar--collapsed:focus-within .sidebar-label,
+.app-sidebar--collapsed:focus-within .sidebar-hide,
+.app-sidebar--collapsed:focus-within .sidebar-footer {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.app-sidebar--collapsed:hover .brand-copy,
+.app-sidebar--collapsed:hover .sidebar-label,
+.app-sidebar--collapsed:focus-within .brand-copy,
+.app-sidebar--collapsed:focus-within .sidebar-label {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+  border: 0;
+  white-space: nowrap;
+}
+
+.app-sidebar--collapsed:hover .brand,
+.app-sidebar--collapsed:hover .sidebar-actions,
+.app-sidebar--collapsed:hover .sidebar-nav-item,
+.app-sidebar--collapsed:focus-within .brand,
+.app-sidebar--collapsed:focus-within .sidebar-actions,
+.app-sidebar--collapsed:focus-within .sidebar-nav-item {
+  justify-content: flex-start;
+}
+
+.app-sidebar--collapsed:hover .sidebar-nav-item,
+.app-sidebar--collapsed:focus-within .sidebar-nav-item {
+  padding-inline: 13px;
+}
+
+.app-sidebar--collapsed:hover .sidebar-nav-item::after,
+.app-sidebar--collapsed:focus-within .sidebar-nav-item::after {
+  display: none;
+}
+
+/* Header stacked once; flex-row again when pop-out open. */
+.app-sidebar--collapsed:hover .sidebar-header,
+.app-sidebar--collapsed:focus-within .sidebar-header {
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.app-sidebar--collapsed:hover .sidebar-hide,
+.app-sidebar--collapsed:focus-within .sidebar-hide {
+  display: inline-grid;
+}
+
+.app-sidebar--collapsed .brand-copy,
+.app-sidebar--collapsed .sidebar-label,
+.app-sidebar--collapsed .sidebar-hide,
+.app-sidebar--collapsed .sidebar-footer {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-12px);
+}
+
+.app-sidebar--collapsed .brand,
+.app-sidebar--collapsed .sidebar-nav-item {
+  justify-content: center;
+}
+
+/* Collapsed rail (76px) cannot fit mark + two buttons side by side:
+   stack header vertically, keep only the expand toggle. Only applies while
+   still collapsed — hover-expand returns to row. */
+.app-sidebar--collapsed:not(:hover):not(:focus-within) .sidebar-header {
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px 8px;
+}
+
+.app-sidebar--collapsed:not(:hover):not(:focus-within) .sidebar-hide {
+  display: none;
+}
+
+.app-sidebar--collapsed:not(:hover):not(:focus-within) .sidebar-actions {
+  justify-content: center;
+}
+
+.app-sidebar--collapsed .sidebar-nav-item {
+  padding-inline: 0;
+}
+
+/* Collapsed labels stay in DOM for accessible names but leave layout flow. */
+.app-sidebar--collapsed .brand-copy,
+.app-sidebar--collapsed .sidebar-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+.app-sidebar--hidden {
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border-right-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-16px);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 78px;
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border);
+  gap: 8px;
+}
+
+.brand {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--color-accent-contrast);
+  background: linear-gradient(135deg, #d8b4fe, var(--color-accent));
+  box-shadow: 0 8px 16px rgba(167, 139, 250, 0.26);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.brand-copy,
+.sidebar-label,
+.sidebar-footer {
+  transition:
+    opacity var(--transition-fast) ease,
+    transform var(--transition-fast) ease;
+}
+
+.brand-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.brand-copy strong {
+  overflow: hidden;
+  font-size: 0.94rem;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+}
+
+.brand-copy span {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+}
+
+.sidebar-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.sidebar-toggle,
+.sidebar-hide,
+.sidebar-reveal-button {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.045);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast) ease,
+    border-color var(--transition-fast) ease,
+    color var(--transition-fast) ease,
+    transform var(--transition-base) var(--ease-out-expo);
+}
+
+.sidebar-toggle:hover,
+.sidebar-hide:hover,
+.sidebar-reveal-button:hover {
+  color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-toggle:active,
+.sidebar-hide:active,
+.sidebar-reveal-button:active {
+  transform: scale(0.96);
+}
+
+.sidebar-toggle:focus-visible,
+.sidebar-hide:focus-visible,
+.sidebar-reveal-button:focus-visible,
+.sidebar-nav-item:focus-visible {
+  outline: 3px solid rgba(167, 139, 250, 0.72);
+  outline-offset: 2px;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 6px;
+  padding: 16px 12px;
+  margin: 0;
+  list-style: none;
+}
+
+.sidebar-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 13px;
+  overflow: visible;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition:
+    color var(--transition-fast) ease,
+    background-color var(--transition-fast) ease,
+    border-color var(--transition-fast) ease,
+    transform var(--transition-base) var(--ease-out-expo);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sidebar-nav-item:hover {
+    border-color: rgba(255, 255, 255, 0.07);
+    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+  }
+}
+
+.sidebar-nav-item.is-active {
+  border-color: rgba(167, 139, 250, 0.3);
+  color: #f6f3ff;
+  background: linear-gradient(
+    90deg,
+    rgba(167, 139, 250, 0.22),
+    rgba(167, 139, 250, 0.05)
+  );
+}
+
+.sidebar-nav-item.is-active::before {
+  position: absolute;
+  left: -13px;
+  width: 3px;
+  height: 22px;
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+  background: var(--color-accent-strong);
+  content: "";
+  box-shadow: 0 0 12px rgba(196, 181, 253, 0.72);
+}
+
+.sidebar-label {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+}
+
+.listening-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.78rem;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--color-success);
+  box-shadow: 0 0 10px rgba(79, 209, 197, 0.75);
+}
+
+.app-sidebar--collapsed .sidebar-nav-item::after {
+  position: absolute;
+  left: calc(100% + 12px);
+  z-index: var(--z-tooltip);
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  opacity: 0;
+  color: #f8fafc;
+  background: #1c202b;
+  box-shadow: var(--shadow-md);
+  content: attr(data-tooltip);
+  font-size: 0.76rem;
+  pointer-events: none;
+  transform: translateX(-5px);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+  white-space: nowrap;
+}
+
+.app-sidebar--collapsed .sidebar-nav-item:hover::after,
+.app-sidebar--collapsed .sidebar-nav-item:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sidebar-reveal-button {
+  position: fixed;
+  z-index: var(--z-sidebar-reveal);
+  top: 18px;
+  left: 16px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.sidebar-reveal-button--mobile {
+  display: none;
+}
+
+/* === Step 6 — Mobile drawer (CSS-first; JS drawers toggle attribute) ===
+   Desktop: lg+ (≥ 1200px) honors expanded/collapsed/hidden inline via
+   hidden attribute on reveal button.
+   Mobile/tablet: breakpoint is lg (MUI < lg => below 1200px). Sidebar
+   becomes fixed drawer min 280px / 84vw with backdrop. Desktop hidden vs
+   mobile drawer-closed are distinct: on mobile hidden == closed drawer.
+   No JS media-query subscription needed — CSS breakpoints are source of
+   truth. AppShell adds data-mobile-drawer-open. */
+.app-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sidebar-backdrop);
+  display: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.44);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-mobile-close {
+  display: none;
+}
+
+/* Desktop default: sidebar modes drive visibility; backdrop closed lane absent. */
+@media (min-width: 1200px) {
+  .sidebar-mobile-close {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1199.95px) {
+  /* TopAppBar title hidden on very narrow viewport already; hide desktop rail. */
+  .app-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: var(--z-sidebar-drawer);
+    width: min(280px, 84vw);
+    height: 100vh;
+    height: 100dvh;
+    box-shadow: 18px 0 42px rgba(0, 0, 0, 0.38);
+    /* Drawer always drawer-width on mobile — ignore collapsed inline state. */
+    transform: translateX(-100%);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-sidebar-backdrop {
+    display: block;
+  }
+
+  /* Open drawer overrides: attribute on shell wins over collapsed/hidden classes. */
+  [data-mobile-drawer-open="true"] .app-sidebar {
+    transform: translateX(0);
+  }
+
+  /* Collapsed/hidden classes must not clip content inside open mobile drawer. */
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed,
+  [data-mobile-drawer-open="true"] .app-sidebar--hidden {
+    width: min(280px, 84vw);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .brand-copy,
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .sidebar-label,
+  [data-mobile-drawer-open="true"] .app-sidebar--hidden .brand-copy,
+  [data-mobile-drawer-open="true"] .app-sidebar--hidden .sidebar-label {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    clip-path: none;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    overflow: visible;
+    white-space: nowrap;
+  }
+
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .sidebar-footer,
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .sidebar-hide {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .brand,
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .sidebar-actions,
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .sidebar-nav-item {
+    justify-content: flex-start;
+  }
+
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .sidebar-nav-item {
+    padding-inline: 13px;
+  }
+
+  /* Hide desktop chrome inside mobile drawer; close button replaces it. */
+  .app-sidebar .sidebar-toggle,
+  .app-sidebar .sidebar-hide {
+    display: none !important;
+  }
+
+  .sidebar-mobile-close {
+    display: inline-grid;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Desktop reveal must not appear on mobile — mobile has its own trigger. */
+  .sidebar-reveal-button:not(.sidebar-reveal-button--mobile) {
+    display: none !important;
+  }
+
+  .sidebar-reveal-button--mobile {
+    display: inline-grid;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: 11px;
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.045);
+    cursor: pointer;
+    /* Sits inside TopAppBar toolbar — neutralize fixed desktop positioning. */
+    position: static;
+    z-index: auto;
+    top: auto;
+    left: auto;
+  }
+
+  .sidebar-reveal-button--mobile:focus-visible {
+    outline: 3px solid rgba(167, 139, 250, 0.72);
+    outline-offset: 2px;
+  }
+
+  /* Full-width drawer shows labels — collapsed tooltip not needed. */
+  [data-mobile-drawer-open="true"] .app-sidebar--collapsed .sidebar-nav-item::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar,
+  .sidebar-label,
+  .brand-copy,
+  .sidebar-footer,
+  .sidebar-nav-item {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+}
+
+[data-reduce-motion="true"] .app-sidebar,
+[data-reduce-motion="true"] .sidebar-label,
+[data-reduce-motion="true"] .brand-copy,
+[data-reduce-motion="true"] .sidebar-footer,
+[data-reduce-motion="true"] .sidebar-nav-item {
+  transition-duration: 0.01ms !important;
+  animation: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -27,4 +659,185 @@
 [data-reduce-motion="true"] * {
   animation-duration: 0.01ms !important;
   transition-duration: 0.01ms !important;
+}
+
+/* === Feature A — Floating micro-interactions (Step 5) === */
+/* ponytail: .play-button keeps MUI theme colors (no forced gradient);
+   full gradient-CTA ceiling lives in plan spec — restore if brand CTA needed. */
+.float-button {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  will-change: transform, box-shadow;
+  transition:
+    transform var(--transition-base) var(--ease-out-expo),
+    box-shadow var(--transition-base) ease,
+    background-color var(--transition-fast) ease,
+    border-color var(--transition-fast) ease;
+}
+
+.float-button::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  border-radius: inherit;
+  opacity: 0;
+  background: var(--color-accent-glow);
+  content: "";
+  filter: blur(14px);
+  transform: scale(0.85);
+  pointer-events: none;
+  transition:
+    opacity var(--transition-base) ease,
+    transform var(--transition-base) var(--ease-out-expo);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .float-button:not(:disabled):not([aria-disabled="true"]):hover {
+    border-color: rgba(167, 139, 250, 0.42);
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 1px rgba(167, 139, 250, 0.08);
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .float-button:not(:disabled):not([aria-disabled="true"]):hover::before {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+
+  .float-button:not(:disabled):not([aria-disabled="true"]):active {
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px) scale(0.96);
+  }
+}
+
+.float-button:focus-visible {
+  outline: 3px solid rgba(167, 139, 250, 0.72);
+  outline-offset: 3px;
+}
+
+.float-button:disabled,
+.float-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.play-button svg {
+  transition: transform var(--transition-base) var(--ease-out-expo);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .play-button:not(:disabled):not([aria-disabled="true"]):hover svg {
+    transform: translateX(2px) scale(1.12);
+  }
+}
+
+.float-icon-button {
+  transition:
+    transform var(--transition-base) var(--ease-out-expo),
+    background-color var(--transition-fast) ease,
+    border-color var(--transition-fast) ease,
+    box-shadow var(--transition-base) ease,
+    color var(--transition-fast) ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .float-icon-button:not(:disabled):not([aria-disabled="true"]):hover {
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+  }
+
+  .float-icon-button:not(:disabled):not([aria-disabled="true"]):active {
+    transform: translateY(0) scale(0.95);
+  }
+}
+
+.float-icon-button:focus-visible {
+  outline: 3px solid rgba(167, 139, 250, 0.72);
+  outline-offset: 2px;
+}
+
+.float-icon-button:disabled,
+.float-icon-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.playlist-card {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  transition:
+    transform 240ms var(--ease-out-expo),
+    box-shadow 240ms ease,
+    border-color var(--transition-fast) ease,
+    background-color var(--transition-fast) ease;
+}
+
+.playlist-card:focus-visible {
+  outline: 3px solid rgba(167, 139, 250, 0.72);
+  outline-offset: 3px;
+}
+
+.playlist-card__cover {
+  overflow: hidden;
+  /* Cover is a gradient Box + Avatar (no img tag): scale wrapper itself. */
+  transition: transform 360ms var(--ease-out-expo);
+  will-change: transform;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .playlist-card:hover {
+    border-color: rgba(167, 139, 250, 0.3);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-5px);
+  }
+
+  .playlist-card:hover .playlist-card__cover {
+    transform: scale(1.06);
+  }
+
+  .playlist-card:active {
+    transform: translateY(-2px) scale(0.99);
+  }
+}
+
+/* Icon-button lift for sidebar chrome (icon intensity, no CTA glow). */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sidebar-toggle:hover,
+  .sidebar-hide:hover,
+  .sidebar-reveal-button:hover {
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+  }
+}
+
+/* Calm press feedback for nav items (hover lift already defined above). */
+.sidebar-nav-item:active {
+  transform: translateY(0) scale(0.99);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-button,
+  .float-button::before,
+  .float-icon-button,
+  .play-button svg,
+  .playlist-card,
+  .playlist-card__cover {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+}
+
+[data-reduce-motion="true"] .float-button,
+[data-reduce-motion="true"] .float-button::before,
+[data-reduce-motion="true"] .float-icon-button,
+[data-reduce-motion="true"] .play-button svg,
+[data-reduce-motion="true"] .playlist-card,
+[data-reduce-motion="true"] .playlist-card__cover {
+  transition-duration: 0.01ms !important;
+  animation: none !important;
 }
