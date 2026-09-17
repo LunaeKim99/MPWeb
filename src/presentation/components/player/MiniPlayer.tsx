@@ -54,6 +54,7 @@ export function MiniPlayer({
         </Typography>
       </Box>
       <IconButton
+        className="float-icon-button"
         aria-label={status === "playing" ? "Pause" : "Play"}
         onClick={onTogglePlayPause}
       >

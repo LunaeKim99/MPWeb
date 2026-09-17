@@ -40,6 +40,7 @@ export function PlaybackControls({
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <IconButton
         size="small"
+        className="float-icon-button"
         aria-label="Acak"
         title={shuffleEnabled ? "Acak (Aktif)" : "Acak (Nonaktif)"}
         onClick={onToggleShuffle}
@@ -50,6 +51,7 @@ export function PlaybackControls({
       </IconButton>
 
       <IconButton
+        className="float-icon-button"
         aria-label="Sebelumnya"
         title="Sebelumnya"
         onClick={onPrev}
@@ -59,6 +61,7 @@ export function PlaybackControls({
       </IconButton>
 
       <IconButton
+        className="float-button play-button"
         aria-label={isPlaying ? "Jeda" : "Putar"}
         title={isLoading ? "Memuat..." : isPlaying ? "Jeda" : "Putar"}
         onClick={onTogglePlayPause}
@@ -77,6 +80,7 @@ export function PlaybackControls({
       </IconButton>
 
       <IconButton
+        className="float-icon-button"
         aria-label="Berikutnya"
         title="Berikutnya"
         onClick={onNext}
@@ -87,6 +91,7 @@ export function PlaybackControls({
 
       <IconButton
         size="small"
+        className="float-icon-button"
         aria-label={repeatLabel}
         title={`Ulangi (${repeatMode})`}
         onClick={onRepeatCycle}

@@ -27,6 +27,7 @@ export function PlaylistCard({ playlist, trackCount }: PlaylistCardProps) {
     <Box
       component={Link}
       to={`/playlists/${playlist.id}`}
+      className="playlist-card"
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -40,6 +41,7 @@ export function PlaylistCard({ playlist, trackCount }: PlaylistCardProps) {
       }}
     >
       <Box
+        className="playlist-card__cover"
         sx={{
           height: 140,
           borderRadius: 2,

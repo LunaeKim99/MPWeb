@@ -65,6 +65,7 @@ export function NowPlayingDialog({
     >
       <Box sx={{ display: "flex", justifyContent: "flex-end", px: 1, pt: 1 }}>
         <IconButton
+          className="float-icon-button"
           aria-label="Close"
           title="Close"
           onClick={onClose}

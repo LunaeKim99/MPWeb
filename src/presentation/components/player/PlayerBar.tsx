@@ -165,6 +165,7 @@ export function PlayerBar() {
         </Box>
         <IconButton
           size="small"
+          className="float-icon-button"
           aria-label={favorite ? "Remove favorite" : "Add favorite"}
           onClick={() => void toggleFavorite(currentTrack.id)}
         >
@@ -197,6 +198,7 @@ export function PlayerBar() {
         >
           <IconButton
             size="small"
+            className="float-icon-button"
             aria-label={isMutedVisual ? "Unmute" : "Mute"}
             onClick={() => void toggleMute()}
           >
@@ -214,6 +216,7 @@ export function PlayerBar() {
           />
         </Box>
         <IconButton
+          className="float-icon-button"
           aria-label="Queue"
           title="Queue"
           onClick={() => setQueueOpen(true)}

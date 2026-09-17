@@ -6,7 +6,24 @@ import Typography from "@mui/material/Typography";
 import { Link } from "react-router-dom";
 import MicaSurface from "@/presentation/components/common/MicaSurface.tsx";
 
-export function TopAppBar() {
+interface TopAppBarProps {
+  mobileDrawerOpen?: boolean;
+  onOpenMobileDrawer?: () => void;
+  onCloseMobileDrawer?: () => void;
+  mobileTriggerRef?: React.RefObject<HTMLButtonElement | null>;
+}
+
+export function TopAppBar({
+  mobileDrawerOpen = false,
+  onOpenMobileDrawer,
+  onCloseMobileDrawer,
+  mobileTriggerRef,
+}: TopAppBarProps) {
+  const toggleMobile = () => {
+    if (mobileDrawerOpen) onCloseMobileDrawer?.();
+    else onOpenMobileDrawer?.();
+  };
+
   return (
     <MicaSurface
       sx={{
@@ -26,6 +43,20 @@ export function TopAppBar() {
         sx={{ boxShadow: "none" }}
       >
         <Toolbar sx={{ gap: 1.5, minHeight: { xs: 56, sm: 64 } }}>
+          <button
+            type="button"
+            ref={mobileTriggerRef as React.RefObject<HTMLButtonElement>}
+            className="sidebar-reveal-button sidebar-reveal-button--mobile"
+            aria-label={
+              mobileDrawerOpen ? "Tutup menu navigasi" : "Buka menu navigasi"
+            }
+            aria-expanded={mobileDrawerOpen}
+            aria-controls="app-sidebar"
+            onClick={toggleMobile}
+            // Visible only below lg via CSS; inline sx would conflict with tokens.
+          >
+            {mobileDrawerOpen ? "✕" : "☰"}
+          </button>
           <Typography
             variant="h6"
             component={Link}
@@ -37,7 +68,7 @@ export function TopAppBar() {
               display: { xs: "block", lg: "none" },
             }}
           >
-            Local Music Player
+            MPWeb
           </Typography>
           <Typography
             variant="body2"
@@ -50,6 +81,7 @@ export function TopAppBar() {
           <IconButton
             component={Link}
             to="/settings"
+            className="float-icon-button"
             aria-label="Open settings"
             title="Settings"
             size="small"
